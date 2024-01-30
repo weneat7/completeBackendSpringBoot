@@ -12,9 +12,9 @@ public interface UserService {
 
     public User create(User user);
 
-    public User update(Long id,User user);
+    public User update(Long id,User user) throws UserNotExistExceptoin;
 
-    public User replace(Long id,User user);
+    public User replace(Long id,User user) throws UserNotExistExceptoin;
 
     public User delete(Long id);
 }

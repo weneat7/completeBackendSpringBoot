@@ -15,6 +15,7 @@ import java.io.Serializable;
 public class GeoLocationDto implements Serializable {
     @JsonProperty("lat")
     String lat;
+
     @JsonProperty("long")
     String lng;
 }

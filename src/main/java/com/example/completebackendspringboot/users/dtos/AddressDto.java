@@ -15,12 +15,16 @@ import java.io.Serializable;
 public class AddressDto implements Serializable {
     @JsonProperty("city")
     String city;
+
     @JsonProperty("street")
     String street;
+
     @JsonProperty("number")
     Long number;
+
     @JsonProperty("zipcode")
     String zipcode;
+
     @JsonProperty("geolocation")
     GeoLocationDto geolocation;
 

@@ -15,6 +15,7 @@ import java.io.Serializable;
 public class NameDto implements Serializable {
     @JsonProperty("firstname")
     String firstName;
+
     @JsonProperty("lastname")
     String lastName;
 }

@@ -10,7 +10,11 @@ import com.example.completebackendspringboot.users.models.GeoLocation;
 import com.example.completebackendspringboot.users.models.Name;
 import com.example.completebackendspringboot.users.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpMessageConverterExtractor;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ public class FakeStoreUserService implements UserService{
         this.restTemplate = restTemplate;
     }
 
-    @Override
+    @Override       //Done
     public User get(Long id) throws UserNotExistExceptoin {
         UserDto userDto = restTemplate.getForObject("https://fakestoreapi.com/users/"+id,UserDto.class);
         if(userDto == null)
@@ -35,7 +39,7 @@ public class FakeStoreUserService implements UserService{
         return convertUserDtoIntoUser(userDto);
     }
 
-    @Override
+    @Override       //Done
     public List<User> getAll() throws UserNotExistExceptoin {
         UserDto[] userDtos = restTemplate.getForObject("https://fakestoreapi.com/users",UserDto[].class);
         if(userDtos == null)
@@ -49,27 +53,45 @@ public class FakeStoreUserService implements UserService{
         return users;
     }
 
-    @Override
+    @Override       //Done
     public User create(User user) {
-
-        UserDto userDto = restTemplate.postForObject("https://fakestoreapi.com/users",convertUserIntoUserDto(user),UserDto.class);
+        UserDto userDto = convertUserIntoUserDto(user);
+        userDto = restTemplate.postForObject("https://fakestoreapi.com/users",userDto,UserDto.class);
         return convertUserDtoIntoUser(userDto);
-    }
+    }       //TODO: create method, Bug : returning all values as NULL except id
 
     @Override
-    public User update(Long id,User user) {
-        return null;
-    }
+    public User update(Long id,User user) throws UserNotExistExceptoin {
+        UserDto userDto = convertUserIntoUserDto(user);
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(userDto,UserDto.class);
+        HttpMessageConverterExtractor<UserDto> responseExtractor = new HttpMessageConverterExtractor<>(UserDto.class, restTemplate.getMessageConverters());
+        userDto = restTemplate.execute("https://fakestoreapi.com/users/"+id, HttpMethod.PATCH, requestCallback,responseExtractor,UserDto.class);
+        if(userDto == null)
+            throw new UserNotExistExceptoin("Unable to replace the user at the moment");
+
+        return convertUserDtoIntoUser(userDto);
+    }  //TODO: patch is not supported by FakeStoreApi
 
     @Override
-    public User replace(Long id,User user) {
-        return null;
-    }
+    public User replace(Long id,User user) throws UserNotExistExceptoin {
+        UserDto userDto = convertUserIntoUserDto(user);
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(userDto,UserDto.class);
+        HttpMessageConverterExtractor<UserDto> responseExtractor = new HttpMessageConverterExtractor<>(UserDto.class, restTemplate.getMessageConverters());
+        userDto = restTemplate.execute("https://fakestoreapi.com/users/"+id, HttpMethod.PUT, requestCallback,responseExtractor,UserDto.class);
+        if(userDto == null)
+            throw new UserNotExistExceptoin("Unable to replace the user at the moment");
+
+        return convertUserDtoIntoUser(userDto);
+    }   //DONE
 
     @Override
     public User delete(Long id) {
-        return null;
-    }
+        UserDto userDto = new UserDto();
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(userDto,UserDto.class);
+        HttpMessageConverterExtractor<UserDto> responseExtractor = new HttpMessageConverterExtractor<>(UserDto.class, restTemplate.getMessageConverters());
+        userDto = restTemplate.execute("https://fakestoreapi.com/users/"+id, HttpMethod.DELETE, requestCallback,responseExtractor);
+        return convertUserDtoIntoUser(userDto);
+    }   //DONE
 
     public User convertUserDtoIntoUser(UserDto userDto) {
         User user = new User();
@@ -95,7 +117,7 @@ public class FakeStoreUserService implements UserService{
         user.getName().setLastName(userDto.getName().getLastName());
 
         return user;
-    }
+    }  //DONE
 
 
     public UserDto convertUserIntoUserDto(User user) {
@@ -122,6 +144,6 @@ public class FakeStoreUserService implements UserService{
         userDto.getName().setLastName(user.getName().getLastName());
 
         return userDto;
-    }
+    }   //DONE
 
 }

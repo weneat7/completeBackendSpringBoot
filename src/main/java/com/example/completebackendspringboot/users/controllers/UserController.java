@@ -4,6 +4,8 @@ import com.example.completebackendspringboot.users.exceptions.UserNotExistExcept
 import com.example.completebackendspringboot.users.models.User;
 import com.example.completebackendspringboot.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,34 +21,36 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{id}")
-    public User getSingleUser(@PathVariable("id") Long id) throws UserNotExistExceptoin {
-    return userService.get(id);
+    @GetMapping("/{id}")        //Done
+    public ResponseEntity<User> getSingleUser(@PathVariable("id") Long id) throws UserNotExistExceptoin {
+    User user =  userService.get(id);
+    return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @GetMapping("/")
-    public List<User> getAllUsers() throws UserNotExistExceptoin {
-      return userService.getAll();
+    @GetMapping("/")    //Done
+    public ResponseEntity<List<User>> getAllUsers() throws UserNotExistExceptoin {
+      List<User>users = userService.getAll();
+      return new ResponseEntity<>(users,HttpStatus.OK);
     }
 
-    @PostMapping("/")
-    public User createUser(@RequestBody User user){
-    return userService.create(user);
+    @PostMapping("/create")    //TODO : Bug in fakestoreapi returning null values only
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        return new ResponseEntity<>(userService.create(user),HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{id}")
-    public User updateUser(@PathVariable("id") Long id,@RequestBody User user) {
-        return userService.update(id,user);
+    @PatchMapping("/update/{id}")   //TODO : Not working in fakestoreapi
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long id,@RequestBody User user) throws UserNotExistExceptoin {
+        return new ResponseEntity<>(userService.update(id,user),HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public User replaceUser(@PathVariable("id") Long id,@RequestBody User user) {
-        return userService.replace(id,user);
+    @PutMapping("/rep/{id}")        //Done
+    public ResponseEntity<User> replaceUser(@PathVariable("id") Long id,@RequestBody User user) throws UserNotExistExceptoin {
+        return new ResponseEntity<>(userService.replace(id,user),HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public User deleteUser(@PathVariable("id") Long id) {
-        return userService.delete(id);
+    @DeleteMapping("/del/{id}")     //Done
+    public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(userService.delete(id),HttpStatus.OK);
     }
 
 
